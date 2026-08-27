@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bintang Harapan — Wishlist Saya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0f2b;
+    --bg-elevated: #141a3d;
+    --bg-card: #171e45;
+    --gold: #f5b942;
+    --gold-soft: rgba(245,185,66,0.16);
+    --rose: #e8677d;
+    --text: #f4f2ea;
+    --muted: #8c93b8;
+    --line: rgba(140,147,184,0.18);
+    --radius: 18px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+
+  /* --- Starfield --- */
+  #stars{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(66,80,160,0.35), transparent 55%),
+      radial-gradient(ellipse at 90% 10%, rgba(232,103,125,0.10), transparent 45%),
+      var(--bg);
+  }
+  .star{
+    position:absolute; border-radius:50%; background:#fff;
+    animation: twinkle ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%, 100%{ opacity:.25; transform:scale(1);}
+    50%{ opacity:1; transform:scale(1.4);}
+  }
+
+  .wrap{ position:relative; z-index:1; max-width:1080px; margin:0 auto; padding: 0 24px 100px; }
+
+  /* --- Hero --- */
+  header.hero{
+    padding: 64px 0 40px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.18em; text-transform:uppercase;
+    color: var(--gold); margin-bottom:18px; display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .eyebrow::before, .eyebrow::after{ content:''; width:28px; height:1px; background:var(--gold); opacity:0.5;}
+  h1.title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+  }
+  h1.title em{ font-style:italic; font-weight:500; color: var(--gold); }
+  .subtitle{
+    color: var(--muted);
+    font-size:16px;
+    max-width:480px;
+    margin: 18px auto 0;
+    line-height:1.6;
+  }
+
+  /* --- Progress bar --- */
+  .progress-panel{
+    margin-top:40px;
+    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-card));
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 26px;
+    display:flex; flex-wrap:wrap; gap:22px; align-items:center; justify-content:space-between;
+  }
+  .stat{ text-align:left; }
+  .stat .num{ font-family:'Fraunces', serif; font-size:28px; font-weight:600; color:var(--gold); line-height:1;}
+  .stat .lbl{ font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;}
+
+  /* --- Add form --- */
+  .add-card{
+    margin-top:28px;
+    background: var(--bg-card);
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px;
+  }
+  .add-card h2{
+    font-family:'Fraunces', serif; font-weight:600; font-size:19px; margin-bottom:18px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .add-card h2::before{ content:'✦'; color:var(--gold); }
+  .form-grid{
+    display:grid; grid-template-columns: 2fr 1fr 1fr; gap:14px;
+  }
+  .form-grid .full{ grid-column: 1 / -1; }
+  label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; letter-spacing:0.02em;}
+  input, select, textarea{
+    width:100%; background: var(--bg-elevated); border:1px solid var(--line); color:var(--text);
+    padding:11px 13px; border-radius:10px; font-family:'Inter',sans-serif; font-size:14px; outline:none;
+    transition: border-color .2s;
+  }
+  input:focus, select:focus, textarea:focus{ border-color: var(--gold); }
+  textarea{ resize:vertical; min-height:60px; }
+  ::placeholder{ color: #565d84; }
+
+  .priority-picker{ display:flex; gap:6px; margin-top:4px; }
+  .priority-picker button{
+    width:34px; height:34px; border-radius:9px; border:1px solid var(--line);
+    background: var(--bg-elevated); color: var(--muted); cursor:pointer; font-size:15px;
+    transition: all .15s;
+  }
+  .priority-picker button.active{ background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
+
+  .form-actions{ margin-top:18px; display:flex; justify-content:flex-end; gap:10px; }
+  button.btn{
+    font-family:'Inter', sans-serif; font-weight:600; font-size:14px;
+    padding: 11px 22px; border-radius:10px; border:none; cursor:pointer;
+    transition: transform .15s, box-shadow .15s;
+  }
+  button.btn:active{ transform: scale(0.97); }
+  .btn-primary{ background: var(--gold); color:#20140a; }
+  .btn-primary:hover{ box-shadow: 0 6px 20px rgba(245,185,66,0.35); }
+  .btn-ghost{ background:transparent; color: var(--muted); border:1px solid var(--line); }
+  .btn-ghost:hover{ color: var(--text); border-color:var(--muted); }
+
+  /* --- Controls row --- */
+  .controls{
+    margin-top:36px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+  }
+  .search-box{ flex:1 1 220px; position:relative; }
+  .search-box input{ padding-left:38px; }
+  .search-box::before{
+    content:'⌕'; position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:16px;
+  }
+  .filter-group{ display:flex; gap:8px; flex-wrap:wrap; }
+  .filter-group select{ width:auto; padding-right:30px; }
+  .tab-toggle{ display:flex; background:var(--bg-elevated); border:1px solid var(--line); border-radius:10px; padding:3px; }
+  .tab-toggle button{
+    background:none; border:none; color:var(--muted); font-size:13px; font-weight:600; padding:7px 14px;
+    border-radius:8px; cursor:pointer; font-family:'Inter',sans-serif;
+  }
+  .tab-toggle button.active{ background: var(--gold-soft); color: var(--gold); }
+
+  /* --- Grid --- */
+  .grid{
+    margin-top:22px;
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap:18px;
+  }
+  .card{
+    background: var(--bg-card);
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    position:relative;
+    overflow:hidden;
+    transition: transform .2s, border-color .2s;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .card:hover{ transform: translateY(-3px); border-color: rgba(245,185,66,0.4); }
+  .card.granted{
+    background: linear-gradient(160deg, rgba(245,185,66,0.10), var(--bg-card) 60%);
+    border-color: rgba(245,185,66,0.5);
+  }
+  .card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .badge{
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.05em; text-transform:uppercase;
+    padding:4px 9px; border-radius:99px; background: rgba(255,255,255,0.06); color: var(--muted);
+    white-space:nowrap;
+  }
+  .card-name{ font-family:'Fraunces', serif; font-weight:600; font-size:19px; line-height:1.25; }
+  .card.granted .card-name{ color: var(--gold); }
+  .card-stars{ color: var(--gold); font-size:13px; letter-spacing:2px; }
+  .card-note{ font-size:13px; color: var(--muted); line-height:1.5; }
+  .card-price{ font-family:'JetBrains Mono', monospace; font-size:15px; color:var(--text); font-weight:500; }
+  .card-price-row{ display:flex; align-items:center; gap:8px; }
+  .price-edit-btn{
+    background:none; border:none; color:var(--muted); cursor:pointer; font-size:13px;
+    padding:2px 6px; border-radius:6px; transition: color .15s, background .15s;
+  }
+  .price-edit-btn:hover{ color: var(--gold); background: rgba(255,255,255,0.05); }
+  .price-edit-form{ display:flex; align-items:center; gap:6px; }
+  .price-edit-form input{
+    width:auto; flex:1; padding:7px 10px; font-size:14px; font-family:'JetBrains Mono', monospace;
+  }
+  .price-edit-form button{
+    background: var(--gold-soft); border:1px solid var(--gold); color:var(--gold);
+    border-radius:8px; width:30px; height:30px; cursor:pointer; font-size:13px; flex-shrink:0;
+  }
+  .price-edit-form button.cancel{ background:transparent; border-color:var(--line); color:var(--muted); }
+
+  /* --- Grant celebration animation --- */
+  .card.grant-anim{ animation: grantPulse .7s cubic-bezier(.34,1.56,.64,1); z-index:2; }
+  @keyframes grantPulse{
+    0%{ transform: scale(1); }
+    35%{ transform: scale(1.06); box-shadow: 0 0 0 8px rgba(245,185,66,0.18), 0 10px 40px rgba(245,185,66,0.35); }
+    100%{ transform: scale(1); box-shadow:none; }
+  }
+  .card.grant-anim::before{
+    content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background: radial-gradient(circle at 50% 40%, rgba(245,185,66,0.55), transparent 70%);
+    animation: flashFade .8s ease-out forwards;
+  }
+  @keyframes flashFade{
+    0%{ opacity:1; } 100%{ opacity:0; }
+  }
+  .burst-particle{
+    position:absolute; top:50%; left:50%; z-index:3; pointer-events:none;
+    width:6px; height:6px; border-radius:50%; background: var(--gold);
+    box-shadow: 0 0 6px 1px rgba(245,185,66,0.8);
+    animation: burstOut .85s cubic-bezier(.25,.8,.35,1) forwards;
+  }
+  @keyframes burstOut{
+    0%{ transform: translate(-50%,-50%) scale(1); opacity:1; }
+    100%{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0); opacity:0; }
+  }
+  .granted-toast{
+    position:fixed; left:50%; bottom:32px; transform: translateX(-50%) translateY(20px);
+    background: var(--bg-card); border:1px solid var(--gold); color: var(--gold);
+    font-family:'Fraunces', serif; font-weight:600; font-size:14px;
+    padding: 12px 22px; border-radius:99px; z-index:50; opacity:0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    transition: opacity .3s ease, transform .3s ease;
+    pointer-events:none;
+  }
+  .granted-toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+  .card-link{ font-size:13px; color: var(--gold); text-decoration:none; }
+  .card-link:hover{ text-decoration:underline; }
+  .card-actions{ margin-top:auto; padding-top:10px; display:flex; gap:8px; border-top:1px solid var(--line); }
+  .icon-btn{
+    flex:1; background:none; border:none; color:var(--muted); font-size:12px; font-weight:600; cursor:pointer;
+    padding:7px 0; border-radius:8px; transition: background .15s, color .15s; font-family:'Inter',sans-serif;
+  }
+  .icon-btn:hover{ background: rgba(255,255,255,0.05); color: var(--text); }
+  .icon-btn.danger:hover{ color: var(--rose); }
+  .icon-btn.grant{ color: var(--gold); }
+
+  .empty-state{
+    grid-column: 1 / -1;
+    text-align:center; padding: 60px 20px; color: var(--muted);
+  }
+  .empty-state .glyph{ font-size:34px; color: var(--gold); margin-bottom:14px; opacity:0.8;}
+  .empty-state p{ font-size:14px; max-width:320px; margin: 6px auto 0; line-height:1.6;}
+
+  footer{ text-align:center; margin-top:60px; color: var(--muted); font-size:12px; }
+
+  @media (max-width: 640px){
+    .form-grid{ grid-template-columns: 1fr 1fr; }
+    .progress-panel{ flex-direction:column; align-items:stretch; }
+  }
+
+  /* focus visibility */
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible{
+    outline: 2px solid var(--gold); outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">wishlist pribadi</div>
+    <h1 class="title">Bintang <em>Harapan</em></h1>
+    <p class="subtitle">Kumpulkan barang dan hal yang kamu impikan di satu tempat. Susun prioritas, catat harga, dan tandai saat permintaanmu terwujud.</p>
+
+    <div class="progress-panel">
+      <div class="stat"><div class="num" id="statTotal">0</div><div class="lbl">Total wish</div></div>
+      <div class="stat"><div class="num" id="statGranted">0</div><div class="lbl">Terwujud</div></div>
+      <div class="stat"><div class="num" id="statCost">Rp0</div><div class="lbl">Estimasi biaya</div></div>
+    </div>
+  </header>
+
+  <section class="add-card">
+    <h2>Tambah wish baru</h2>
+    <div class="form-grid">
+      <div class="full">
+        <label for="fName">Nama barang / hal</label>
+        <input id="fName" type="text" placeholder="mis. Kamera mirrorless, Liburan ke Jepang...">
+      </div>
+      <div>
+        <label for="fCategory">Kategori</label>
+        <select id="fCategory">
+          <option>Barang</option>
+          <option>Pengalaman</option>
+          <option>Elektronik</option>
+          <option>Lainnya</option>
+        </select>
+      </div>
+      <div>
+        <label for="fPrice">Estimasi harga (Rp)</label>
+        <input id="fPrice" type="number" min="0" placeholder="0">
+      </div>
+      <div>
+        <label>Prioritas</label>
+        <div class="priority-picker" id="priorityPicker">
+          <button type="button" data-v="1">✦</button>
+          <button type="button" data-v="2">✦</button>
+          <button type="button" data-v="3">✦</button>
+          <button type="button" data-v="4">✦</button>
+          <button type="button" data-v="5">✦</button>
+        </div>
+      </div>
+      <div class="full">
+        <label for="fLink">Tautan (opsional)</label>
+        <input id="fLink" type="url" placeholder="https://...">
+      </div>
+      <div class="full">
+        <label for="fNote">Catatan (opsional)</label>
+        <textarea id="fNote" placeholder="Kenapa kamu menginginkan ini?"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" id="btnClear">Bersihkan</button>
+      <button class="btn btn-primary" id="btnAdd">✦ Tambah ke langit</button>
+    </div>
+  </section>
+
+  <div class="controls">
+    <div class="search-box">
+      <input id="searchInput" type="text" placeholder="Cari wish...">
+    </div>
+    <div class="filter-group">
+      <select id="filterCategory">
+        <option value="">Semua kategori</option>
+        <option>Barang</option>
+        <option>Pengalaman</option>
+        <option>Elektronik</option>
+        <option>Lainnya</option>
+      </select>
+      <select id="sortBy">
+        <option value="newest">Terbaru</option>
+        <option value="priority">Prioritas tertinggi</option>
+        <option value="price-asc">Harga terendah</option>
+        <option value="price-desc">Harga tertinggi</option>
+      </select>
+      <div class="tab-toggle">
+        <button data-tab="active" class="active">Belum</button>
+        <button data-tab="granted">Terwujud</button>
+        <button data-tab="all">Semua</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>Data tersimpan otomatis di perangkat ini ✦</footer>
+</div>
+
+<script>
+(function(){
+  // --- Starfield generation ---
+  const starsContainer = document.getElementById('stars');
+  const starCount = 90;
+  for(let i=0;i<starCount;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random()*2.2 + 0.8;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDuration = (Math.random()*3 + 2.5)+'s';
+    s.style.animationDelay = (Math.random()*4)+'s';
+    starsContainer.appendChild(s);
+  }
+
+  // --- State ---
+  let items = [];
+  let priorityValue = 3;
+  let currentTab = 'active';
+  let editingPriceId = null;
+  const STORAGE_KEY = 'wishlist-items';
+
+  const grid = document.getElementById('grid');
+  const priorityPicker = document.getElementById('priorityPicker');
+
+  function setPriority(v){
+    priorityValue = v;
+    [...priorityPicker.children].forEach(btn=>{
+      btn.classList.toggle('active', parseInt(btn.dataset.v) <= v);
+    });
+  }
+  priorityPicker.addEventListener('click', (e)=>{
+    if(e.target.tagName === 'BUTTON') setPriority(parseInt(e.target.dataset.v));
+  });
+  setPriority(3);
+
+  function fmtRupiah(n){
+    if(!n) return 'Rp0';
+    return 'Rp' + Number(n).toLocaleString('id-ID');
+  }
+
+  function starsHtml(n){
+    let out = '';
+    for(let i=1;i<=5;i++) out += i<=n ? '✦' : '✧';
+    return out;
+  }
+
+  function loadItems(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      items = raw ? JSON.parse(raw) : [];
+    }catch(e){
+      items = [];
+    }
+    render();
+  }
+
+  function saveItems(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }catch(e){
+      console.error('Gagal menyimpan wishlist', e);
+    }
+  }
+
+  function clearForm(){
+    document.getElementById('fName').value = '';
+    document.getElementById('fPrice').value = '';
+    document.getElementById('fLink').value = '';
+    document.getElementById('fNote').value = '';
+    document.getElementById('fCategory').selectedIndex = 0;
+    setPriority(3);
+  }
+
+  document.getElementById('btnClear').addEventListener('click', clearForm);
+
+  document.getElementById('btnAdd').addEventListener('click', async ()=>{
+    const name = document.getElementById('fName').value.trim();
+    if(!name){
+      document.getElementById('fName').focus();
+      document.getElementById('fName').style.borderColor = 'var(--rose)';
+      setTimeout(()=>{ document.getElementById('fName').style.borderColor=''; }, 1200);
+      return;
+    }
+    const item = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      name,
+      category: document.getElementById('fCategory').value,
+      price: parseInt(document.getElementById('fPrice').value) || 0,
+      priority: priorityValue,
+      link: document.getElementById('fLink').value.trim(),
+      note: document.getElementById('fNote').value.trim(),
+      granted: false,
+      createdAt: Date.now()
+    };
+    items.unshift(item);
+    saveItems();
+    clearForm();
+    render();
+  });
+
+  // Controls
+  document.getElementById('searchInput').addEventListener('input', render);
+  document.getElementById('filterCategory').addEventListener('change', render);
+  document.getElementById('sortBy').addEventListener('change', render);
+  document.querySelectorAll('.tab-toggle button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-toggle button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      render();
+    });
+  });
+
+  function toggleGranted(id, cardEl){
+    const it = items.find(i=>i.id===id);
+    if(!it) return;
+    const becomingGranted = !it.granted;
+    it.granted = becomingGranted;
+    saveItems();
+    if(becomingGranted && cardEl){
+      playGrantAnimation(cardEl, it.name);
+      setTimeout(render, 850);
+    } else {
+      render();
+    }
+  }
+
+  function playGrantAnimation(cardEl, name){
+    cardEl.classList.add('grant-anim');
+    const count = 14;
+    for(let i=0;i<count;i++){
+      const p = document.createElement('span');
+      p.className = 'burst-particle';
+      const angle = (Math.PI*2*i/count) + (Math.random()*0.4 - 0.2);
+      const dist = 60 + Math.random()*50;
+      p.style.setProperty('--dx', Math.cos(angle)*dist + 'px');
+      p.style.setProperty('--dy', Math.sin(angle)*dist + 'px');
+      p.style.animationDelay = (Math.random()*0.1)+'s';
+      cardEl.appendChild(p);
+    }
+    showToast(`✦ "${name}" terwujud!`);
+  }
+
+  let toastTimer = null;
+  function showToast(msg){
+    let toast = document.getElementById('grantedToast');
+    if(!toast){
+      toast = document.createElement('div');
+      toast.id = 'grantedToast';
+      toast.className = 'granted-toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    requestAnimationFrame(()=> toast.classList.add('show'));
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> toast.classList.remove('show'), 2200);
+  }
+
+  function deleteItem(id){
+    items = items.filter(i=>i.id!==id);
+    saveItems();
+    ren
